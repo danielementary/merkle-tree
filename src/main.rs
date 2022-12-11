@@ -1,21 +1,22 @@
-type HashFunction = fn(String) -> String;
+type Hash = String;
+type HashFunction = fn(String) -> Hash;
 
 fn main() {
     println!("Hello, merkle tree!");
 }
 
-fn dummy_hash(input: String) -> String {
+fn dummy_hash(input: String) -> Hash {
     format!("Hash of ({})", input)
 }
 
 #[derive(Clone)]
 struct Node {
-    hash: String,
+    hash: Hash,
 }
 
 struct Opening {
-    partner_hash: String,
-    root_child_hash: String,
+    partner_hash: Hash,
+    root_child_hash: Hash,
 }
 
 struct MerkleTree {
@@ -49,7 +50,7 @@ impl MerkleTree {
         }
     }
 
-    fn get_node_hash(&self, index: usize) -> String {
+    fn get_node_hash(&self, index: usize) -> Hash {
         match &self.nodes[index] {
             Some(node) => node.hash.clone(),
             None => (self.hash_function)("empty node".to_string()),
@@ -57,7 +58,7 @@ impl MerkleTree {
     }
 
     fn update_internal_nodes(&mut self) {
-        for i in (0..Self::sum_of_powers_of_two(&self.height - 1)).rev() {
+        for i in (0..Self::sum_of_powers_of_two(self.height - 1)).rev() {
             if self.nodes[i].is_none() {
                 let left_child_index = 2 * i;
 
@@ -72,7 +73,7 @@ impl MerkleTree {
         }
     }
 
-    fn get_root(self) -> String {
+    fn get_root(self) -> Hash {
         match &self.nodes[0] {
             Some(root) => root.hash.clone(),
             None => "error".to_string(),
