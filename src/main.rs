@@ -30,6 +30,15 @@ impl MerkleTree {
         }
     }
 
+    fn insert(mut self, value: String) {
+        let index = Self::sum_of_powers_of_two(self.height - 1) + self.length;
+        let hash = (self.hash_function)(value);
+
+        self.nodes[index] = Some(Node { hash });
+
+        self.length += 1;
+    }
+
     fn sum_of_powers_of_two(n: usize) -> usize {
         2 ^ (n + 1) - 1
     }
