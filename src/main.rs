@@ -3,6 +3,24 @@ type HashFunction = fn(String) -> Hash;
 
 fn main() {
     println!("Hello, merkle tree!");
+
+    let mut mt = MerkleTree::from_height(dummy_hash, 2);
+
+    mt.insert("Hello".to_string());
+    mt.insert("Merkle".to_string());
+    mt.insert("Tree".to_string());
+
+    mt.update_internal_nodes();
+
+    println!("root: {}", mt.get_root());
+
+    let value_index = 2;
+    let value = mt.get_value(value_index);
+    let opening = mt.get_opening(value_index);
+
+    println!("value: {}", value);
+    println!("partner: {}", opening.partner_hash);
+    println!("root child: {}", opening.root_child_hash);
 }
 
 fn dummy_hash(input: String) -> Hash {
@@ -44,7 +62,7 @@ impl MerkleTree {
         }
     }
 
-    fn insert(mut self, value: String) {
+    fn insert(&mut self, value: String) {
         let next_leaf_node_index = self.first_leaf_node_index + self.length;
 
         if next_leaf_node_index >= self.nodes.len() {
@@ -93,21 +111,21 @@ impl MerkleTree {
         }
     }
 
-    fn get_root(self) -> Hash {
+    fn get_root(&self) -> Hash {
         self.get_node_hash(1)
     }
 
-    fn get_value(self, value_index: usize) -> Hash {
+    fn get_value(&self, value_index: usize) -> Hash {
         let index = self.first_leaf_node_index + value_index;
 
         self.get_node_hash(index)
     }
 
-    fn get_opening(self, value_index: usize) -> Opening {
+    fn get_opening(&self, value_index: usize) -> Opening {
         let node_index = self.first_leaf_node_index + value_index;
 
         let partner_index;
-        if (node_index % 2 == 0) {
+        if node_index % 2 == 0 {
             partner_index = node_index + 1;
         } else {
             partner_index = node_index - 1;
@@ -125,6 +143,6 @@ impl MerkleTree {
     }
 
     fn sum_of_powers_of_two(n: usize) -> usize {
-        2 ^ (n + 1) - 1
+        2usize.pow((n + 1) as u32) - 1
     }
 }
