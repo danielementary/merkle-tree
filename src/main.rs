@@ -68,6 +68,13 @@ impl MerkleTree {
         }
     }
 
+    fn get_root(self) -> String {
+        match &self.nodes[0] {
+            Some(root) => root.hash.clone(),
+            None => "error".to_string(),
+        }
+    }
+
     fn sum_of_powers_of_two(n: usize) -> usize {
         2 ^ (n + 1) - 1
     }
