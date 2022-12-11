@@ -5,7 +5,7 @@ fn main() {
 }
 
 fn dummy_hash(input: String) -> String {
-    "Hash of ({input})".to_string()
+    format!("Hash of ({})", input)
 }
 
 #[derive(Clone)]
@@ -37,6 +37,35 @@ impl MerkleTree {
         self.nodes[index] = Some(Node { hash });
 
         self.length += 1;
+
+        let mut i = index / 2;
+        while i > 0 {
+            self.nodes[i] = None;
+            i /= 2;
+        }
+    }
+
+    fn get_node_hash(&self, index: usize) -> String {
+        match &self.nodes[index] {
+            Some(node) => node.hash.clone(),
+            None => (self.hash_function)("empty node".to_string()),
+        }
+    }
+
+    fn update_internal_nodes(&mut self) {
+        for i in (0..Self::sum_of_powers_of_two(&self.height - 1)).rev() {
+            if self.nodes[i].is_none() {
+                let left_child_index = 2 * i;
+
+                let left_child_hash = self.get_node_hash(left_child_index);
+                let right_child_hash = self.get_node_hash(left_child_index + 1);
+
+                let hash =
+                    (self.hash_function)(format!("{} | {}", left_child_hash, right_child_hash));
+
+                self.nodes[i] = Some(Node { hash });
+            }
+        }
     }
 
     fn sum_of_powers_of_two(n: usize) -> usize {
