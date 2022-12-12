@@ -16,11 +16,8 @@ fn main() {
 
     let value_index = 2;
     let value = mt.get_value(value_index);
-    let opening = mt.get_opening(value_index);
 
     println!("value: {}", value);
-    println!("partner: {}", opening.partner_hash);
-    println!("root child: {}", opening.root_child_hash);
 }
 
 fn dummy_hash(input: String) -> Hash {
@@ -30,11 +27,6 @@ fn dummy_hash(input: String) -> Hash {
 #[derive(Clone)]
 struct Node {
     hash: Hash,
-}
-
-struct Opening {
-    partner_hash: Hash,
-    root_child_hash: Hash,
 }
 
 struct MerkleTree {
@@ -119,27 +111,6 @@ impl MerkleTree {
         let index = self.first_leaf_node_index + value_index;
 
         self.get_node_hash(index)
-    }
-
-    fn get_opening(&self, value_index: usize) -> Opening {
-        let node_index = self.first_leaf_node_index + value_index;
-
-        let partner_index;
-        if node_index % 2 == 0 {
-            partner_index = node_index + 1;
-        } else {
-            partner_index = node_index - 1;
-        }
-
-        let mut root_child_index = node_index;
-        for _ in 0..(self.height - 1) {
-            root_child_index /= 2;
-        }
-
-        Opening {
-            partner_hash: self.get_node_hash(partner_index),
-            root_child_hash: self.get_node_hash(root_child_index),
-        }
     }
 
     fn sum_of_powers_of_two(n: usize) -> usize {
