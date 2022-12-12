@@ -19,8 +19,8 @@ pub struct MerkleTree {
     /// the merkle tree is implemented as a linear array of `Option<Node>`,
     /// where the nodes are sorted in a breadth first fashion
     /// `nodes[0]` is always `None`
-    /// `nodes[1]` is always `Some(node)`, where `node` is the root of the merkle tree
-    /// the follwing nodes up to `first_leaf_node_index` correspond to
+    /// `nodes[1]` is either None or `Some(node)`, where `node` is the root of the merkle tree
+    /// the following nodes up to `first_leaf_node_index` correspond to
     /// the internal nodes of the merkle tree followed by
     /// the external nodes, which correspond to the hash of the inserted values
     nodes: Vec<Option<Node>>,
