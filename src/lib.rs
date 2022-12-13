@@ -335,7 +335,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn height_one_get_root_none() {
+    fn height_one_get_root_none_panics() {
         let mt = MerkleTree {
             hash_function: basic_hash,
             height: 1,
@@ -364,14 +364,41 @@ mod tests {
             height: 1,
             length: 2,
             first_leaf_node_index: 2,
-            nodes: vec![
-                None,
-                Some(root),
-                Some(node_one.clone()),
-                Some(node_two.clone()),
-            ],
+            nodes: vec![None, Some(root), Some(node_one), Some(node_two)],
         };
 
         assert_eq!("H(H(1) | H(2))", mt.get_root());
+    }
+
+    #[test]
+    fn height_one_half_full_get_value() {
+        let node_one = Node {
+            hash: "H(1)".to_string(),
+        };
+
+        let mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 1,
+            first_leaf_node_index: 2,
+            nodes: vec![None, None, Some(node_one), None],
+        };
+
+        assert_eq!("H(1)", mt.get_value(0));
+        assert_eq!("H(empty node)", mt.get_value(1));
+    }
+
+    #[test]
+    #[should_panic]
+    fn height_one_get_value_out_of_bounds_panics() {
+        let mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 0,
+            first_leaf_node_index: 2,
+            nodes: vec![None, None, None, None],
+        };
+
+        mt.get_value(2);
     }
 }
