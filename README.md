@@ -14,7 +14,7 @@ This is a simple Rust implementation of a merkle tree.
 - [x] add error handling
 - [x] improve modularity
 - [x] add documentation
-- [ ] add unit tests
+- [x] add unit tests
 - [ ] implement advanced `MerkleTree` methods
     - [ ] `get_opening`
     - [ ] `verify_opening`
