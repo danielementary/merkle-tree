@@ -184,4 +184,81 @@ mod tests {
     fn from_height_eleven_panics() {
         MerkleTree::from_height(basic_hash, 11);
     }
+
+    #[test]
+    fn height_one_insert() {
+        let mut mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 0,
+            first_leaf_node_index: 2,
+            nodes: vec![None; 4],
+        };
+
+        let value_one = "1".to_string();
+        let node_one = Node {
+            hash: basic_hash(value_one.clone()),
+        };
+
+        mt.insert(value_one);
+        assert_eq!(1, mt.length);
+        assert_eq!(vec![None, None, Some(node_one.clone()), None], mt.nodes);
+
+        let value_two = "2".to_string();
+        let node_two = Node {
+            hash: basic_hash(value_two.clone()),
+        };
+
+        mt.insert(value_two);
+        assert_eq!(2, mt.length);
+        assert_eq!(vec![None, None, Some(node_one), Some(node_two)], mt.nodes);
+    }
+
+    #[test]
+    #[should_panic]
+    fn height_one_insert_full_panics() {
+        let node_one = Node {
+            hash: basic_hash("1".to_string()),
+        };
+        let node_two = Node {
+            hash: basic_hash("2".to_string()),
+        };
+
+        let mut full_mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 2,
+            first_leaf_node_index: 2,
+            nodes: vec![None, None, Some(node_one), Some(node_two)],
+        };
+
+        full_mt.insert("3".to_string());
+    }
+
+    #[test]
+    fn height_one_insert_two_set_root_to_none() {
+        let root = Node {
+            hash: basic_hash("1 | empty node".to_string()),
+        };
+        let node_one = Node {
+            hash: basic_hash("1".to_string()),
+        };
+
+        let mut mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 1,
+            first_leaf_node_index: 2,
+            nodes: vec![None, Some(root), Some(node_one.clone()), None],
+        };
+
+        let value_two = "2".to_string();
+        let node_two = Node {
+            hash: basic_hash(value_two.clone()),
+        };
+
+        mt.insert(value_two);
+        assert_eq!(2, mt.length);
+        assert_eq!(vec![None, None, Some(node_one), Some(node_two)], mt.nodes);
+    }
 }
