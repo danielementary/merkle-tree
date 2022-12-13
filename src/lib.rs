@@ -332,4 +332,46 @@ mod tests {
             mt.nodes
         );
     }
+
+    #[test]
+    #[should_panic]
+    fn height_one_get_root_none() {
+        let mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 0,
+            first_leaf_node_index: 2,
+            nodes: vec![None; 4],
+        };
+
+        mt.get_root();
+    }
+
+    #[test]
+    fn height_one_get_root_some() {
+        let root = Node {
+            hash: "H(H(1) | H(2))".to_string(),
+        };
+        let node_one = Node {
+            hash: "H(1)".to_string(),
+        };
+        let node_two = Node {
+            hash: "H(2)".to_string(),
+        };
+
+        let mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 2,
+            first_leaf_node_index: 2,
+            nodes: vec![
+                None,
+                Some(root),
+                Some(node_one.clone()),
+                Some(node_two.clone()),
+            ],
+        };
+
+        assert_eq!("H(H(1) | H(2))", mt.get_root());
+    }
 }
