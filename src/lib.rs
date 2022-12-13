@@ -238,7 +238,7 @@ mod tests {
     #[test]
     fn height_one_insert_two_set_root_to_none() {
         let root = Node {
-            hash: basic_hash("1 | empty node".to_string()),
+            hash: basic_hash("H(1) | H(empty node)".to_string()),
         };
         let node_one = Node {
             hash: basic_hash("1".to_string()),
@@ -260,5 +260,76 @@ mod tests {
         mt.insert(value_two);
         assert_eq!(2, mt.length);
         assert_eq!(vec![None, None, Some(node_one), Some(node_two)], mt.nodes);
+    }
+
+    #[test]
+    fn height_one_empty_update_internal_node() {
+        let mut mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 0,
+            first_leaf_node_index: 2,
+            nodes: vec![None; 4],
+        };
+
+        mt.update_internal_nodes();
+
+        let root = Node {
+            hash: "H(H(empty node) | H(empty node))".to_string(),
+        };
+
+        assert_eq!(vec![None, Some(root), None, None], mt.nodes);
+    }
+
+    #[test]
+    fn height_one_half_full_update_internal_node() {
+        let node_one = Node {
+            hash: "H(1)".to_string(),
+        };
+
+        let mut mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 1,
+            first_leaf_node_index: 2,
+            nodes: vec![None, None, Some(node_one.clone()), None],
+        };
+
+        mt.update_internal_nodes();
+
+        let root = Node {
+            hash: "H(H(1) | H(empty node))".to_string(),
+        };
+
+        assert_eq!(vec![None, Some(root), Some(node_one), None], mt.nodes);
+    }
+
+    #[test]
+    fn height_one_full_update_internal_node() {
+        let node_one = Node {
+            hash: "H(1)".to_string(),
+        };
+        let node_two = Node {
+            hash: "H(2)".to_string(),
+        };
+
+        let mut mt = MerkleTree {
+            hash_function: basic_hash,
+            height: 1,
+            length: 2,
+            first_leaf_node_index: 2,
+            nodes: vec![None, None, Some(node_one.clone()), Some(node_two.clone())],
+        };
+
+        mt.update_internal_nodes();
+
+        let root = Node {
+            hash: "H(H(1) | H(2))".to_string(),
+        };
+
+        assert_eq!(
+            vec![None, Some(root), Some(node_one), Some(node_two)],
+            mt.nodes
+        );
     }
 }
