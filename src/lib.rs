@@ -2,7 +2,7 @@ pub type Hash = String;
 pub type HashFunction = fn(String) -> Hash;
 
 /// a single node of the merkle tree
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Debug)]
 struct Node {
     /// a node only contains the hash corresponding to its position in the merkle tree
     hash: Hash,
@@ -132,5 +132,56 @@ impl MerkleTree {
     /// formula to compute 1 + 2 + ... + 2^n
     fn sum_of_powers_of_two(n: usize) -> usize {
         2usize.pow((n + 1) as u32) - 1
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn basic_hash(input: String) -> Hash {
+        format!("H({})", input)
+    }
+
+    #[test]
+    #[should_panic]
+    fn from_height_zero_panics() {
+        MerkleTree::from_height(basic_hash, 0);
+    }
+
+    #[test]
+    fn from_height_one() {
+        let mt = MerkleTree::from_height(basic_hash, 1);
+
+        assert_eq!(1, mt.height);
+        assert_eq!(0, mt.length);
+        assert_eq!(2, mt.first_leaf_node_index);
+        assert_eq!(vec![None; 4], mt.nodes);
+    }
+
+    #[test]
+    fn from_height_five() {
+        let mt = MerkleTree::from_height(basic_hash, 5);
+
+        assert_eq!(5, mt.height);
+        assert_eq!(0, mt.length);
+        assert_eq!(32, mt.first_leaf_node_index);
+        assert_eq!(vec![None; 64], mt.nodes);
+    }
+
+    #[test]
+    fn from_height_ten() {
+        let mt = MerkleTree::from_height(basic_hash, 10);
+
+        assert_eq!(10, mt.height);
+        assert_eq!(0, mt.length);
+        assert_eq!(1024, mt.first_leaf_node_index);
+        assert_eq!(vec![None; 2048], mt.nodes);
+    }
+
+    #[test]
+    #[should_panic]
+    fn from_height_eleven_panics() {
+        MerkleTree::from_height(basic_hash, 11);
     }
 }
